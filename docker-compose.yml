@@ -1,0 +1,12 @@
+services:
+ player:
+  build: .
+  stdin_open: true
+  tty: true
+  depends_on:
+   - redis
+
+ redis:
+  image: redis:7-alpine
+  ports:
+   - "6379:6379"
