@@ -1,0 +1,1 @@
+{"app_name":"music-player-devops","environment":"staging","services":{"grafana":{"port":3000},"player":{"port":8000},"prometheus":{"port":9090},"redis":{"port":6379}}}
