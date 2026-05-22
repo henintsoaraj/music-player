@@ -3,6 +3,22 @@ import math
 import os
 import sys
 import redis
+from prometheus_client import Counter, Gauge, start_http_server
+
+SONGS_PLAYED = Counter(
+    "player_songs_played_total",
+    "Nombre total de chansons jouées"
+)
+
+CURRENT_BPM = Gauge(
+    "player_current_bpm",
+    "BPM de la chanson en cours"
+)
+
+ERRORS = Counter(
+    "player_errors_total",
+    "Nombre total d'erreurs"
+)
 
 def get_redis():
     try:
@@ -10,6 +26,7 @@ def get_redis():
         r.ping()
         return r
     except Exception:
+        ERRORS.inc()
         return None
 
 BARS   = " ▁▂▃▄▅▆▇█"
@@ -77,11 +94,14 @@ def render_player(track, elapsed, duration=30):
     print(c("dim", "  Entrée = suivant   ctrl+c = quitter"))
 
 def main():
+    start_http_server(8000)
     r = get_redis()
     idx = int(r.get("current_track") or 0) if r else 0
     try:
         while True:
             track = PLAYLIST[idx]
+            SONGS_PLAYED.inc()
+            CURRENT_BPM.set(track["bpm"])
             start = time.time()
             while True:
                 elapsed = time.time() - start

@@ -1,12 +1,28 @@
 services:
- player:
-  build: .
-  stdin_open: true
-  tty: true
-  depends_on:
-   - redis
+  player:
+    build: .
+    stdin_open: true
+    tty: true
+    depends_on:
+      - redis
+    ports:
+      - "8000:8000"
 
- redis:
-  image: redis:7-alpine
-  ports:
-   - "6379:6379"
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
