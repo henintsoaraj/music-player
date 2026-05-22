@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupère le code
+        uses: actions/checkout@v4
+
+      - name: Installe Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installe les dépendances
+        run: pip install -r requirements.txt
+
+      - name: Lance les tests
+        run: python -m pytest app/ -v
+
+      - name: Build Docker
+        run: docker build -t music-player:latest .
